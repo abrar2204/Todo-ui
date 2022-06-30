@@ -3,3 +3,5 @@ scopeconfig:
 fileignoreconfig:
 - filename: yarn.lock
   checksum: 4d2ca394130801ac632679758ec87da971cf64ad906bce8962feb562a08801fc
+- filename: src/components/TodoList/TodoList.jsx
+  checksum: fa83d490fc1a295397a71e49adb6fc522bc96e22a0b6cc2714c296606313857a

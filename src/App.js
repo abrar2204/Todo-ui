@@ -1,8 +1,9 @@
 import React from "react";
+import TodoList from "./components/TodoList/TodoList.jsx";
 
 const App = () => {
   return <div>
-    <p>Hello, World!</p>
+    <TodoList/>
   </div>;
 };
 

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "proxy": "http://localhost:8080",
   "scripts": {
     "dev": "webpack-dev-server",
     "test": "jest"
@@ -11,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.27.2",
     "jest-environment-jsdom": "^28.1.2",
     "jsdom": "^20.0.0",
     "react": "^18.2.0",
@@ -35,7 +37,7 @@
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.9.3"
   },
-  "jest":{
+  "jest": {
     "testEnvironment": "jsdom"
   }
 }
