@@ -12,6 +12,14 @@ const TodoList = () => {
     })
   },[]);
 
+  const deleteTodo = (todoId)=>{
+    axios.delete(`/api/todo/${todoId}`).then(res=>{
+      if(res.data.success){
+        setTodos(prevTodos=>prevTodos.filter(({id})=>id!==todoId));
+      }
+    })
+  }
+
   return(
     <div>
       <h1>Welcome to your TodoList</h1>
@@ -19,6 +27,7 @@ const TodoList = () => {
         todos.map(todo =>
           <div data-testid={`todo-${todo.id}`} key={todo.id}>
             <h3>{todo.title}</h3>
+            <button data-testid={`delete-button-${todo.id}`} onClick={()=>deleteTodo(todo.id)}>Delete</button>
           </div>
         )
       }
