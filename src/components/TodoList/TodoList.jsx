@@ -4,6 +4,7 @@ import axios from "axios";
 const TodoList = () => {
   const [todos, setTodos] = useState([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isUpdateForm,setIsUpdateForm] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: ""
@@ -43,9 +44,31 @@ const TodoList = () => {
     setFormData(prev => ({...prev, [name]: value}));
   }
 
-  const submitForm = (event)=> {
+  const submitForm = (event)=>{
     event.preventDefault();
+    if(isUpdateForm){
+      updateTodo();
+      return;
+    }
     createTodo()
+  }
+
+  const updateTodo = () => {
+    if (isFormDataInValid()){
+      return;
+    }
+    axios.put(`/api/todo/${formData.id}`, formData).then(res => {
+      if (res.data.success) {
+        setTodos(prev => prev.map(todo=> todo.id === formData.id ? res.data.success : todo));
+        resetForm();
+      }
+    })
+  }
+
+  const resetForm = ()=>{
+    setFormData({title: "",description: ""});
+    setIsFormVisible(false);
+    setIsUpdateForm(false);
   }
 
   const isFormDataInValid = () => {
@@ -75,9 +98,15 @@ const TodoList = () => {
     }).then(res => {
       if (res.data.success) {
         setTodos(prev => [...prev, res.data.success]);
-        setFormData({title: "",description: ""});
+        resetForm();
       }
     })
+  }
+
+  const showUpdateTodoForm = (todo) => {
+    setIsFormVisible(true);
+    setIsUpdateForm(true);
+    setFormData(todo);
   }
 
   return (
@@ -96,7 +125,7 @@ const TodoList = () => {
             <input id='description' name='description' value={formData.description} onChange={handleChange}/>
             {errors['description'] && <p>Invalid Description</p>}
           </div>
-          <button type='submit' data-testid="create-todo">Create</button>
+          <button type='submit' data-testid="submit-form-button">{isUpdateForm ? 'Update':'Create'}</button>
         </form>
       }
       {
@@ -106,6 +135,7 @@ const TodoList = () => {
             <p>{todo.description}</p>
             <p>{todo.createdAt}</p>
             <button data-testid={`delete-button-${todo.id}`} onClick={() => deleteTodo(todo.id)}>Delete</button>
+            <button data-testid={`show-update-todo-${todo.id}`} onClick={() => showUpdateTodoForm(todo)}>Update</button>
           </div>
         )
       }

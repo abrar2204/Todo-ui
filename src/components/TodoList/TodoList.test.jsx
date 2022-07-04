@@ -104,7 +104,7 @@ describe("TodoList", () => {
     })
     await user.type(screen.getByLabelText("Title"), "Get Pizza");
     await user.type(screen.getByLabelText("Description"), "Order Pizza from Dominos");
-    await user.click(screen.getByTestId('create-todo'));
+    await user.click(screen.getByTestId('submit-form-button'));
 
     await waitFor(() => {
       expect(screen.queryByText("Get Pizza")).toBeInTheDocument();
@@ -120,7 +120,64 @@ describe("TodoList", () => {
       expect(screen.getByLabelText("Title")).toBeInTheDocument();
       expect(screen.getByLabelText("Description")).toBeInTheDocument();
     })
-    await user.click(screen.getByTestId('create-todo'));
+    await user.click(screen.getByTestId('submit-form-button'));
+
+    await waitFor(() => {
+      expect(screen.queryByText("Invalid Title")).toBeInTheDocument();
+      expect(screen.queryByText("Invalid Description")).toBeInTheDocument();
+    })
+  })
+
+  it('should show update form for todo when update button is clicked', async () => {
+    const user = userEvent.setup();
+    axios.put.mockResolvedValueOnce({
+      data: {
+        success: {
+          "id": 1,
+          "title": "Download Video Game",
+          "description": "Install Monster Hunter Rise Sunbreak",
+          "completed": false,
+          "createdAt": "2020-01-03"
+        },
+        error: null
+      }
+    });
+    render(<TodoList/>);
+    await waitFor(() => {
+      expect(screen.getByText("Download Game")).toBeInTheDocument();
+      expect(screen.getByText("Install Monster Hunter Rise Sunbreak")).toBeInTheDocument();
+    })
+
+    await user.click(screen.getByTestId('show-update-todo-1'));
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("Download Game")).toBeInTheDocument();
+      expect(screen.getByDisplayValue("Install Monster Hunter Rise Sunbreak")).toBeInTheDocument();
+    })
+    await userEvent.type(screen.getByDisplayValue("Download Game"), "Download Video Game");
+    await user.click(screen.getByTestId('submit-form-button'));
+
+    await waitFor(() => {
+      expect(screen.getByText("Download Video Game")).toBeInTheDocument();
+      expect(screen.getByText("Install Monster Hunter Rise Sunbreak")).toBeInTheDocument();
+    })
+  })
+
+  it('should show warning when invalid title and description is given and update button is clicked', async () => {
+    const user = userEvent.setup();
+    render(<TodoList/>);
+    await waitFor(() => {
+      expect(screen.getByText("Download Game")).toBeInTheDocument();
+      expect(screen.getByText("Install Monster Hunter Rise Sunbreak")).toBeInTheDocument();
+    })
+
+    await user.click(screen.getByTestId('show-update-todo-1'));
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("Download Game")).toBeInTheDocument();
+      expect(screen.getByDisplayValue("Install Monster Hunter Rise Sunbreak")).toBeInTheDocument();
+    })
+    await userEvent.clear(screen.getByDisplayValue("Download Game"));
+    await userEvent.clear(screen.getByDisplayValue("Install Monster Hunter Rise Sunbreak"));
+    await user.click(screen.getByTestId('submit-form-button'));
 
     await waitFor(() => {
       expect(screen.queryByText("Invalid Title")).toBeInTheDocument();
