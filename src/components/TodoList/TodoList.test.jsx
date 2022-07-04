@@ -32,52 +32,100 @@ const getAllTodosResponse = {
   "error": null
 }
 
+const deleteTodoResponse = {
+  "success": "Successfully deleted 1 todo",
+  "error": null
+}
+
 jest.mock('axios');
 
-describe("TodoList",()=>{
+describe("TodoList", () => {
 
-  it("should render a todo list",()=>{
-    const {asFragment} = render(<TodoList/>);
-
-    expect(screen.getByText("Welcome to your TodoList")).toBeInTheDocument();
-    expect(asFragment).toMatchSnapshot();
+  beforeEach(() => {
+    axios.get.mockResolvedValueOnce({data: getAllTodosResponse});
   })
 
-  it("should render a list of todos",async ()=>{
-    axios.get.mockResolvedValueOnce({ data: getAllTodosResponse });
-    const {asFragment} = render(<TodoList/>);
+  afterEach(() => {
+    jest.clearAllMocks();
+  })
+
+  it("should render a todo list", () => {
+    render(<TodoList/>);
+
+    expect(screen.getByText("Welcome to your TodoList")).toBeInTheDocument();
+  })
+
+  it("should render a list of todos", async () => {
+    render(<TodoList/>);
 
     expect(screen.getByText("Welcome to your TodoList")).toBeInTheDocument();
 
-    await waitFor(()=>{
+    await waitFor(() => {
       expect(screen.queryByTestId("todo-1")).toBeInTheDocument();
       expect(screen.queryByTestId("todo-2")).toBeInTheDocument();
       expect(screen.queryByTestId("todo-3")).toBeInTheDocument();
     })
-
-    expect(asFragment).toMatchSnapshot();
   })
 
-  it("should delete a todo",async()=>{
+  it("should delete a todo", async () => {
     const user = userEvent.setup();
-    axios.get.mockResolvedValueOnce({ data: getAllTodosResponse });
-    axios.delete.mockResolvedValueOnce({data: {
-        "success": "Successfully deleted 1 todo",
-        "error": null
-    }})
-    const {asFragment} = render(<TodoList/>);
+    axios.delete.mockResolvedValueOnce({data: deleteTodoResponse})
+    render(<TodoList/>);
 
     expect(screen.getByText("Welcome to your TodoList")).toBeInTheDocument();
-    await waitFor(()=>{
+    await waitFor(() => {
       expect(screen.getByTestId("todo-1")).toBeInTheDocument();
     })
     await user.click(screen.getByTestId('delete-button-1'));
-    await waitFor(()=>{
+    await waitFor(() => {
       expect(screen.queryByTestId("todo-1")).not.toBeInTheDocument();
     })
-
-    expect(asFragment).toMatchSnapshot();
   })
 
+  it("should create a new todo", async () => {
+    const user = userEvent.setup();
+    axios.post.mockResolvedValueOnce({
+      data: {
+        success: {
+          "title": "Get Pizza",
+          "description": "Order Pizza from Dominos",
+          "completed": false,
+          "createdAt": "2020-01-03"
+        },
+        error: null
+      }
+    });
+    render(<TodoList/>);
+
+    await user.click(screen.getByTestId('show-create-todo'));
+    await waitFor(() => {
+      expect(screen.getByLabelText("Title")).toBeInTheDocument();
+      expect(screen.getByLabelText("Description")).toBeInTheDocument();
+    })
+    await user.type(screen.getByLabelText("Title"), "Get Pizza");
+    await user.type(screen.getByLabelText("Description"), "Order Pizza from Dominos");
+    await user.click(screen.getByTestId('create-todo'));
+
+    await waitFor(() => {
+      expect(screen.queryByText("Get Pizza")).toBeInTheDocument();
+    })
+  })
+
+  it("should show warning if title or description field is empty and the create form is submitted", async () => {
+    const user = userEvent.setup();
+    render(<TodoList/>);
+
+    await user.click(screen.getByTestId('show-create-todo'));
+    await waitFor(() => {
+      expect(screen.getByLabelText("Title")).toBeInTheDocument();
+      expect(screen.getByLabelText("Description")).toBeInTheDocument();
+    })
+    await user.click(screen.getByTestId('create-todo'));
+
+    await waitFor(() => {
+      expect(screen.queryByText("Invalid Title")).toBeInTheDocument();
+      expect(screen.queryByText("Invalid Description")).toBeInTheDocument();
+    })
+  })
 
 })
