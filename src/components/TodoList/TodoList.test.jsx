@@ -97,7 +97,7 @@ describe("TodoList", () => {
     });
     render(<TodoList/>);
 
-    await user.click(screen.getByTestId('show-create-todo'));
+    await user.click(screen.getByTestId("show-form-button"));
     await waitFor(() => {
       expect(screen.getByLabelText("Title")).toBeInTheDocument();
       expect(screen.getByLabelText("Description")).toBeInTheDocument();
@@ -115,7 +115,7 @@ describe("TodoList", () => {
     const user = userEvent.setup();
     render(<TodoList/>);
 
-    await user.click(screen.getByTestId('show-create-todo'));
+    await user.click(screen.getByTestId('show-form-button'));
     await waitFor(() => {
       expect(screen.getByLabelText("Title")).toBeInTheDocument();
       expect(screen.getByLabelText("Description")).toBeInTheDocument();
@@ -186,10 +186,10 @@ describe("TodoList", () => {
     })
   })
 
-  it("should able to check and uncheck todo",async()=>{
+  it("should able to check and uncheck todo", async () => {
     const user = userEvent.setup();
     axios.put.mockResolvedValue({
-      data:{
+      data: {
         error: null
       }
     })

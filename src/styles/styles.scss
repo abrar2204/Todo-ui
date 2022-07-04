@@ -4,27 +4,30 @@
 *,
 *::before,
 *::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-html{
-    font-size: 62.5%;
+html {
+  font-size: 62.5%;
 }
 
-body{
-    font-family: 'Open Sans', sans-serif;
-    font-size: 1.6rem;
-    background-color: $background-color;
-    color: $primary-font-color;
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1.6rem;
+  background-color: $background-color;
+  color: $primary-font-color;
 }
-input{
-    font-family: 'Open Sans', sans-serif;
+
+input {
+  font-family: 'Open Sans', sans-serif;
 }
-button{
-    font-family: 'Open Sans', sans-serif;
-    &:hover{
-        cursor: pointer;
-    }
+
+button {
+  font-family: 'Open Sans', sans-serif;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
