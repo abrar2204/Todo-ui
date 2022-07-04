@@ -4,7 +4,7 @@ import axios from "axios";
 const TodoList = () => {
   const [todos, setTodos] = useState([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [isUpdateForm,setIsUpdateForm] = useState(false);
+  const [isUpdateForm, setIsUpdateForm] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: ""
@@ -44,9 +44,9 @@ const TodoList = () => {
     setFormData(prev => ({...prev, [name]: value}));
   }
 
-  const submitForm = (event)=>{
+  const submitForm = (event) => {
     event.preventDefault();
-    if(isUpdateForm){
+    if (isUpdateForm) {
       updateTodo();
       return;
     }
@@ -54,19 +54,19 @@ const TodoList = () => {
   }
 
   const updateTodo = () => {
-    if (isFormDataInValid()){
+    if (isFormDataInValid()) {
       return;
     }
     axios.put(`/api/todo/${formData.id}`, formData).then(res => {
       if (res.data.success) {
-        setTodos(prev => prev.map(todo=> todo.id === formData.id ? res.data.success : todo));
+        setTodos(prev => prev.map(todo => todo.id === formData.id ? res.data.success : todo));
         resetForm();
       }
     })
   }
 
-  const resetForm = ()=>{
-    setFormData({title: "",description: ""});
+  const resetForm = () => {
+    setFormData({title: "", description: ""});
     setIsFormVisible(false);
     setIsUpdateForm(false);
   }
@@ -75,7 +75,7 @@ const TodoList = () => {
     if (errors.title || errors.description) {
       return true;
     }
-    if(!formData.title || !formData.description){
+    if (!formData.title || !formData.description) {
       setErrors({
         title: !formData.title,
         description: !formData.description
@@ -87,7 +87,7 @@ const TodoList = () => {
 
   const createTodo = () => {
 
-    if (isFormDataInValid()){
+    if (isFormDataInValid()) {
       return
     }
 
@@ -109,6 +109,16 @@ const TodoList = () => {
     setFormData(todo);
   }
 
+  const checkOrUnCheckTodo = (oldTodo) => (event) => {
+    const newTodo = {...oldTodo, completed: event.target.checked};
+    setTodos(prevTodos => prevTodos.map(todo => todo.id === oldTodo.id ? newTodo : todo));
+    axios.put(`/api/todo/${oldTodo.id}`,newTodo).then(res => {
+      if (res.data.error) {
+        setTodos(prev => prev.map(todo => todo.id === oldTodo.id ? oldTodo : todo));
+      }
+    })
+  }
+
   return (
     <div>
       <h1>Welcome to your TodoList</h1>
@@ -125,12 +135,19 @@ const TodoList = () => {
             <input id='description' name='description' value={formData.description} onChange={handleChange}/>
             {errors['description'] && <p>Invalid Description</p>}
           </div>
-          <button type='submit' data-testid="submit-form-button">{isUpdateForm ? 'Update':'Create'}</button>
+          <button type='submit' data-testid="submit-form-button">{isUpdateForm ? 'Update' : 'Create'}</button>
         </form>
       }
       {
         todos.map(todo =>
           <div data-testid={`todo-${todo.id}`} key={todo.id}>
+            <input
+              type='checkbox'
+              name={`todo-checkbox-${todo.id}`}
+              data-testid={`todo-checkbox-${todo.id}`}
+              checked={todo.completed}
+              onChange={checkOrUnCheckTodo(todo)}
+            />
             <h3>{todo.title}</h3>
             <p>{todo.description}</p>
             <p>{todo.createdAt}</p>

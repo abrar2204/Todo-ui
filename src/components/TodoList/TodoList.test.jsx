@@ -164,6 +164,7 @@ describe("TodoList", () => {
 
   it('should show warning when invalid title and description is given and update button is clicked', async () => {
     const user = userEvent.setup();
+
     render(<TodoList/>);
     await waitFor(() => {
       expect(screen.getByText("Download Game")).toBeInTheDocument();
@@ -183,6 +184,31 @@ describe("TodoList", () => {
       expect(screen.queryByText("Invalid Title")).toBeInTheDocument();
       expect(screen.queryByText("Invalid Description")).toBeInTheDocument();
     })
+  })
+
+  it("should able to check and uncheck todo",async()=>{
+    const user = userEvent.setup();
+    axios.put.mockResolvedValue({
+      data:{
+        error: null
+      }
+    })
+    render(<TodoList/>);
+    await waitFor(() => {
+      expect(screen.getByTestId('todo-checkbox-1')).toBeInTheDocument();
+      expect(screen.getByText("Download Game")).toBeInTheDocument();
+      expect(screen.getByText("Install Monster Hunter Rise Sunbreak")).toBeInTheDocument();
+    })
+
+    expect(screen.getByTestId('todo-checkbox-1')).toBeChecked();
+
+    await userEvent.click(screen.getByTestId('todo-checkbox-1'));
+
+    expect(screen.getByTestId('todo-checkbox-1')).not.toBeChecked();
+
+    await userEvent.click(screen.getByTestId('todo-checkbox-1'));
+
+    expect(screen.getByTestId('todo-checkbox-1')).toBeChecked();
   })
 
 })
